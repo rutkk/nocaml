@@ -32,8 +32,8 @@ module Noc = struct
   let sum (xs : int list) : int =
     List.fold_left (+) 0 xs
 
-  let last (xs : 'a list) : 'a =
-    if xs = [] then failwith "ValueError: last: list must not be empty"
+  let last_with (xs : 'a list) : 'a =
+    if xs = [] then failwith "ValueError: last_with: list must not be empty"
     else List.hd (List.rev xs)
 
   let any (pred : 'a -> bool) (xs : 'a list) : bool =
@@ -42,8 +42,8 @@ module Noc = struct
   let all (pred : 'a -> bool) (xs : 'a list) : bool =
     List.for_all pred xs
 
-  let first (pred : 'a -> bool) (xs : 'a list) : 'a =
-    if xs = [] then failwith "ValueError: first: list must not be empty"
+  let first_with (pred : 'a -> bool) (xs : 'a list) : 'a =
+    if xs = [] then failwith "ValueError: first_with: list must not be empty"
     else List.hd (List.filter pred xs)
 
   let flatten (xss : 'a list list) : 'a list =
@@ -99,6 +99,34 @@ let counter (xs : 'a list) : ('a * int) list =
       aux acc xs'
   in
   aux [] xs
+
+let sort (xs : 'a list) : 'a list =
+  let rec aux = function
+    | [] -> []
+    | x :: xs' ->
+      let smaller = List.filter (fun y -> compare y x < 0) xs' in
+      let larger = List.filter (fun y -> compare y x >= 0) xs' in
+      aux smaller @ (x :: aux larger)
+  in
+  aux xs
+
+  (* ── Aliases ────────────────────────────────────────────── *)
+
+let reverse (xs: 'a list) : 'a list =
+  List.rev xs
+
+let first (xs: 'a list) : 'a =
+  if xs = [] then failwith "ValueError: first: list must not be empty"
+  else List.hd xs
+
+let last (xs: 'a list) : 'a =
+  if xs = [] then failwith "ValueError: last: list must not be empty"
+  else List.hd (List.rev xs)
+
+let at (xs: 'a list) (index: int) : 'a =
+  if index < 0 then failwith "ValueError: at: index must be non-negative"
+  else if index >= List.length xs then failwith "ValueError: at: index out of range"
+  else List.nth xs index
 
   (* ── Strings ────────────────────────────────────────────── *)
   
@@ -160,6 +188,16 @@ let counter (xs : 'a list) : ('a * int) list =
           else aux low (mid - 1)
       in
       aux 0 x
- 
+
+  (* ── Anti-dune build warnings ────────────────────── *)
+
+  let _ = (
+    for_, for_acc, while_, while_acc,
+    sum, last_with, any, all, first_with, flatten, avg,
+    interleave, interleave_many, max, min,
+    counter, sort, reverse, first, last, at,
+    chars, contains, join, split, slice,
+    pow, sqrt_of_int
+  )
 
 end
